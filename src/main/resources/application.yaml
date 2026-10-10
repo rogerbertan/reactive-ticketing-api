@@ -6,3 +6,7 @@ spring:
     url: r2dbc:postgresql://${DB_HOST:localhost}:5432/${DB_NAME:ticketing}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres}
+  flyway:
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/${DB_NAME:ticketing}
+    user: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
