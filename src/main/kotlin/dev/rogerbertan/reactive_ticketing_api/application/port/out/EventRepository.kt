@@ -1,6 +1,7 @@
 package dev.rogerbertan.reactive_ticketing_api.application.port.out
 
 import dev.rogerbertan.reactive_ticketing_api.application.domain.Event
+import dev.rogerbertan.reactive_ticketing_api.application.domain.EventType
 import kotlinx.coroutines.flow.Flow
 
 interface EventRepository {
@@ -8,4 +9,5 @@ interface EventRepository {
     suspend fun findById(id: Long): Event?
     suspend fun save(event: Event): Event
     suspend fun deleteById(id: Long)
+    fun findByType(type: EventType): Flow<Event>
 }

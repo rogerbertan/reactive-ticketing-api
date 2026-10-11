@@ -1,6 +1,7 @@
 package dev.rogerbertan.reactive_ticketing_api.adapter.out.persistence
 
 import dev.rogerbertan.reactive_ticketing_api.application.domain.Event
+import dev.rogerbertan.reactive_ticketing_api.application.domain.EventType
 import dev.rogerbertan.reactive_ticketing_api.application.port.out.EventRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -25,5 +26,9 @@ class EventPersistenceAdapter(
 
     override suspend fun deleteById(id: Long) {
         repository.deleteById(id)
+    }
+
+    override fun findByType(type: EventType): Flow<Event> {
+        return repository.findByType(type).map { it.toDomain() }
     }
 }
