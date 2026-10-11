@@ -29,4 +29,11 @@ class EventService(
             description = cmd.description
         ))
     }
+
+    override suspend fun delete(id: Long) {
+        if (repository.findById(id) == null) {
+            throw EventNotFoundException(id)
+        }
+        repository.deleteById(id)
+    }
 }
