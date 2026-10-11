@@ -1,0 +1,34 @@
+package dev.rogerbertan.reactive_ticketing_api.event.adapter.out.persistence
+
+import dev.rogerbertan.reactive_ticketing_api.event.application.domain.Event
+import dev.rogerbertan.reactive_ticketing_api.event.application.domain.EventType
+import dev.rogerbertan.reactive_ticketing_api.event.application.port.out.EventRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import org.springframework.stereotype.Component
+
+@Component
+class EventPersistenceAdapter(
+    private val repository: EventR2dbcRepository
+) : EventRepository {
+
+    override fun findAll(): Flow<Event> {
+        return repository.findAll().map { it.toDomain() }
+    }
+
+    override suspend fun findById(id: Long): Event? {
+        return repository.findById(id)?.toDomain()
+    }
+
+    override suspend fun save(event: Event): Event {
+        return repository.save(event.toEntity()).toDomain()
+    }
+
+    override suspend fun deleteById(id: Long) {
+        repository.deleteById(id)
+    }
+
+    override fun findByType(type: EventType): Flow<Event> {
+        return repository.findByType(type).map { it.toDomain() }
+    }
+}
