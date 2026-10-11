@@ -1,6 +1,7 @@
 package dev.rogerbertan.reactive_ticketing_api.application.service
 
 import dev.rogerbertan.reactive_ticketing_api.application.domain.Event
+import dev.rogerbertan.reactive_ticketing_api.application.domain.EventType
 import dev.rogerbertan.reactive_ticketing_api.application.domain.exception.EventNotFoundException
 import dev.rogerbertan.reactive_ticketing_api.application.port.`in`.EventUseCase
 import dev.rogerbertan.reactive_ticketing_api.application.port.`in`.command.CreateEventCommand
@@ -35,5 +36,10 @@ class EventService(
             throw EventNotFoundException(id)
         }
         repository.deleteById(id)
+    }
+
+    override fun getByType(type: String): Flow<Event> {
+        val eventType = EventType.valueOf(type.uppercase())
+        return repository.findByType(eventType)
     }
 }
