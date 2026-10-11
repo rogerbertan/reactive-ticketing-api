@@ -22,4 +22,8 @@ class EventPersistenceAdapter(
     override suspend fun save(event: Event): Event {
         return repository.save(event.toEntity()).toDomain()
     }
+
+    override suspend fun deleteById(id: Long) {
+        repository.deleteById(id)
+    }
 }

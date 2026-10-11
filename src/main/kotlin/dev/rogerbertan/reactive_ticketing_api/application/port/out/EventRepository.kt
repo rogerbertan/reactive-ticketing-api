@@ -7,4 +7,5 @@ interface EventRepository {
     fun findAll(): Flow<Event>
     suspend fun findById(id: Long): Event?
     suspend fun save(event: Event): Event
+    suspend fun deleteById(id: Long)
 }
