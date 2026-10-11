@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -18,5 +19,10 @@ class EventController(
     @GetMapping(produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun getAll(): Flow<EventResponse> {
         return service.getAll().map { it.toResponse() }
+    }
+
+    @GetMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    suspend fun getById(@PathVariable id: Long): EventResponse {
+        return service.getById(id).toResponse()
     }
 }
