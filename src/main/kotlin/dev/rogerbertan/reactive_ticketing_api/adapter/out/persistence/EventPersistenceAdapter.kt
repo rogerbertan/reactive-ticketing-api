@@ -14,4 +14,8 @@ class EventPersistenceAdapter(
     override fun findAll(): Flow<Event> {
         return repository.findAll().map { it.toDomain() }
     }
+
+    override suspend fun findById(id: Long): Event? {
+        return repository.findById(id)?.toDomain()
+    }
 }

@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface EventRepository {
     fun findAll(): Flow<Event>
+    suspend fun findById(id: Long): Event?
 }
