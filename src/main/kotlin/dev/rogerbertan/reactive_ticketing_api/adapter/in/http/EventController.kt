@@ -1,8 +1,9 @@
 package dev.rogerbertan.reactive_ticketing_api.adapter.`in`.http
 
-import dev.rogerbertan.reactive_ticketing_api.application.domain.Event
+import dev.rogerbertan.reactive_ticketing_api.adapter.`in`.http.dto.EventResponse
 import dev.rogerbertan.reactive_ticketing_api.application.port.`in`.EventUseCase
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -15,7 +16,7 @@ class EventController(
 ) {
 
     @GetMapping(produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
-    fun getAll(): Flow<Event> {
-        return service.getAll()
+    fun getAll(): Flow<EventResponse> {
+        return service.getAll().map { it.toResponse() }
     }
 }
