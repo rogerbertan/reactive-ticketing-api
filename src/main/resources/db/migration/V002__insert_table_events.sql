@@ -1,4 +1,4 @@
-INSERT INTO eventos (tipo, nome, data, descricao) VALUES
+INSERT INTO events (type, name, date, description) VALUES
 ('SHOW', 'Taylor Swift', '2024-02-15', 'Um evento imperdível para todos os amantes da música pop.'),
 ('TEATRO', 'A Comédia da Vida', '2024-07-20', 'Uma peça teatral emocionante que retrata com humor momentos complexos da vida. Você não pode perder.'),
 ('CONCERTO', 'Concerto de Verão', '2024-06-10', 'Um concerto ao ar livre com grandes nomes da música clássica.'),
