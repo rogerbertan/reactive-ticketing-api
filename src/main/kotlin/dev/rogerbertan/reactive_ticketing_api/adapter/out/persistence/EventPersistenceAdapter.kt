@@ -18,4 +18,8 @@ class EventPersistenceAdapter(
     override suspend fun findById(id: Long): Event? {
         return repository.findById(id)?.toDomain()
     }
+
+    override suspend fun save(event: Event): Event {
+        return repository.save(event.toEntity()).toDomain()
+    }
 }
