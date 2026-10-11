@@ -2,12 +2,13 @@ package dev.rogerbertan.reactive_ticketing_api.adapter.`in`.http
 
 import dev.rogerbertan.reactive_ticketing_api.adapter.`in`.http.dto.EventRequest
 import dev.rogerbertan.reactive_ticketing_api.adapter.`in`.http.dto.EventResponse
-import dev.rogerbertan.reactive_ticketing_api.application.domain.EventType
 import dev.rogerbertan.reactive_ticketing_api.application.port.`in`.EventUseCase
 import jakarta.validation.Valid
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -19,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @RestController
@@ -29,6 +28,8 @@ class EventController(
     private val service: EventUseCase
 ) {
 
+    private val eventFlow = MutableSharedFlow<EventResponse>(extraBufferCapacity = 10)
+
     @GetMapping
     fun getAll(): Flow<EventResponse> {
         return service.getAll().map { it.toResponse() }
@@ -36,9 +37,10 @@ class EventController(
 
     @GetMapping("/categories/{type}", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun getByType(@PathVariable type: String): Flow<EventResponse> {
-        return service.getByType(type)
-            .map { it.toResponse() }
-            .onEach { delay(4.seconds) }
+        return merge(
+            service.getByType(type).map { it.toResponse() },
+            eventFlow
+        ).onEach { delay(4.seconds) }
     }
 
     @GetMapping("/{id}")
@@ -50,6 +52,7 @@ class EventController(
     @ResponseStatus(HttpStatus.CREATED)
     suspend fun create(@RequestBody @Valid request: EventRequest): EventResponse {
         return service.create(request.toCommand()).toResponse()
+            .also { eventFlow.emit(it) }
     }
 
     @DeleteMapping("/{id}")
