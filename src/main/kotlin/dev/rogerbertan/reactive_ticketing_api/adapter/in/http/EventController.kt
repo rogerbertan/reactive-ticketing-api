@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -36,5 +37,11 @@ class EventController(
     @ResponseStatus(HttpStatus.CREATED)
     suspend fun create(@RequestBody @Valid request: EventRequest): EventResponse {
         return service.create(request.toCommand()).toResponse()
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    suspend fun delete(@PathVariable id: Long) {
+        service.delete(id)
     }
 }
