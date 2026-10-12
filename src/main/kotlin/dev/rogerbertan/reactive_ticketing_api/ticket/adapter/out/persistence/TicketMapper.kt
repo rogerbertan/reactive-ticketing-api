@@ -11,3 +11,13 @@ fun TicketEntity.toDomain(): Ticket {
         quantity = quantity,
     )
 }
+
+fun Ticket.toEntity(): TicketEntity {
+    return TicketEntity(
+        id = id,
+        eventId = eventId,
+        type = type,
+        price = price,
+        quantity = quantity,
+    )
+}

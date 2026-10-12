@@ -15,4 +15,12 @@ class TicketPersistenceAdapter(
     override fun getTicketsByEventId(eventId: UUID): Flow<Ticket> {
         return repository.getTicketsByEventId(eventId).map { it.toDomain() }
     }
+
+    override suspend fun getTicketById(id: UUID): Ticket? {
+        return repository.findById(id)?.toDomain()
+    }
+
+    override suspend fun save(ticket: Ticket): Ticket {
+        return repository.save(ticket.toEntity()).toDomain()
+    }
 }
