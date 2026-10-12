@@ -8,6 +8,7 @@ import dev.rogerbertan.reactive_ticketing_api.event.application.port.`in`.comman
 import dev.rogerbertan.reactive_ticketing_api.event.application.port.out.EventRepository
 import kotlinx.coroutines.flow.Flow
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Service
@@ -15,14 +16,17 @@ class EventService(
     private val repository: EventRepository
 ) : EventUseCase {
 
+    @Transactional(readOnly = true)
     override fun getAll(): Flow<Event> {
         return repository.findAll()
     }
 
+    @Transactional(readOnly = true)
     override suspend fun getById(id: UUID): Event {
         return repository.findById(id) ?: throw EventNotFoundException(id)
     }
 
+    @Transactional
     override suspend fun create(cmd: CreateEventCommand): Event {
         return repository.save(Event(
             type = cmd.type,
@@ -32,6 +36,7 @@ class EventService(
         ))
     }
 
+    @Transactional
     override suspend fun delete(id: UUID) {
         if (repository.findById(id) == null) {
             throw EventNotFoundException(id)
@@ -39,6 +44,7 @@ class EventService(
         repository.deleteById(id)
     }
 
+    @Transactional(readOnly = true)
     override fun getByType(type: String): Flow<Event> {
         val eventType = EventType.valueOf(type.uppercase())
         return repository.findByType(eventType)
