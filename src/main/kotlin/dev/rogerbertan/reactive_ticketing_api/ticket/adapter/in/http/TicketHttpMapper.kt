@@ -5,6 +5,7 @@ import dev.rogerbertan.reactive_ticketing_api.ticket.application.domain.Ticket
 
 fun Ticket.toResponse(): TicketResponse {
     return TicketResponse(
+        id = id,
         type = type,
         price = price,
         quantity = quantity
