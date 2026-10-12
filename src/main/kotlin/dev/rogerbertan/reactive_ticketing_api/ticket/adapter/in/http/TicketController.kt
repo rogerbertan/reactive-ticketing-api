@@ -1,8 +1,11 @@
 package dev.rogerbertan.reactive_ticketing_api.ticket.adapter.`in`.http
 
+import dev.rogerbertan.reactive_ticketing_api.ticket.adapter.`in`.http.dto.SaleRequest
+import dev.rogerbertan.reactive_ticketing_api.ticket.adapter.`in`.http.dto.SaleResponse
 import dev.rogerbertan.reactive_ticketing_api.ticket.adapter.`in`.http.dto.TicketRequest
 import dev.rogerbertan.reactive_ticketing_api.ticket.adapter.`in`.http.dto.TicketResponse
 import dev.rogerbertan.reactive_ticketing_api.ticket.application.domain.Ticket
+import dev.rogerbertan.reactive_ticketing_api.ticket.application.port.`in`.SaleUseCase
 import dev.rogerbertan.reactive_ticketing_api.ticket.application.port.`in`.TicketUseCase
 import jakarta.validation.Valid
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +29,8 @@ import java.util.UUID
 @RestController
 @RequestMapping("/v1")
 class TicketController(
-    private val service: TicketUseCase
+    private val ticketService: TicketUseCase,
+    private val saleService: SaleUseCase
 ) {
 
     private val ticketFlow = MutableSharedFlow<Ticket>(extraBufferCapacity = 10)
@@ -34,7 +38,7 @@ class TicketController(
     @GetMapping("/events/{eventId}/tickets", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun getTicketsByEventId(@PathVariable eventId: UUID): Flow<TicketResponse> {
         return merge(
-            service.getTicketsByEventId(eventId),
+            ticketService.getTicketsByEventId(eventId),
             ticketFlow.filter { it.eventId == eventId }
         ).map { it.toResponse() }
     }
@@ -43,7 +47,7 @@ class TicketController(
     suspend fun addTicket(@PathVariable id: UUID,
                           @RequestParam("quantity") quantity: Int)
     : TicketResponse {
-        val ticket = service.addTicket(id, quantity)
+        val ticket = ticketService.addTicket(toAddTicketsCommand(id, quantity))
         ticketFlow.emit(ticket)
         return ticket.toResponse()
     }
@@ -51,8 +55,17 @@ class TicketController(
     @PostMapping("/tickets")
     @ResponseStatus(HttpStatus.CREATED)
     suspend fun createTicket(@Valid @RequestBody request: TicketRequest): TicketResponse {
-        val ticket = service.createTicket(request.toCommand())
+        val ticket = ticketService.createTicket(request.toCommand())
         ticketFlow.emit(ticket)
         return ticket.toResponse()
+    }
+
+    @PostMapping("/tickets/sale")
+    @ResponseStatus(HttpStatus.CREATED)
+    suspend fun createSale(@RequestBody request: SaleRequest): SaleResponse {
+        val sale = saleService.createSale(request.toCommand())
+        val ticket = ticketService.getTicketsById(sale.ticketId)
+        ticketFlow.emit(ticket)
+        return sale.toResponse()
     }
 }
