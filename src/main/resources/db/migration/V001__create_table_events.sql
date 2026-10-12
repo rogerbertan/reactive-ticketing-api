@@ -1,5 +1,5 @@
 create table events(
-    id bigserial not null,
+    id uuid not null default gen_random_uuid(),
     type varchar(30) not null,
     name varchar(100) not null,
     date date,

@@ -6,6 +6,7 @@ import dev.rogerbertan.reactive_ticketing_api.event.application.port.out.EventRe
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.springframework.stereotype.Component
+import java.util.UUID
 
 @Component
 class EventPersistenceAdapter(
@@ -16,7 +17,7 @@ class EventPersistenceAdapter(
         return repository.findAll().map { it.toDomain() }
     }
 
-    override suspend fun findById(id: Long): Event? {
+    override suspend fun findById(id: UUID): Event? {
         return repository.findById(id)?.toDomain()
     }
 
@@ -24,7 +25,7 @@ class EventPersistenceAdapter(
         return repository.save(event.toEntity()).toDomain()
     }
 
-    override suspend fun deleteById(id: Long) {
+    override suspend fun deleteById(id: UUID) {
         repository.deleteById(id)
     }
 

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
 @RestController
@@ -44,7 +45,7 @@ class EventController(
     }
 
     @GetMapping("/{id}")
-    suspend fun getById(@PathVariable id: Long): EventResponse {
+    suspend fun getById(@PathVariable id: UUID): EventResponse {
         return service.getById(id).toResponse()
     }
 
@@ -57,7 +58,7 @@ class EventController(
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    suspend fun delete(@PathVariable id: Long) {
+    suspend fun delete(@PathVariable id: UUID) {
         service.delete(id)
     }
 }

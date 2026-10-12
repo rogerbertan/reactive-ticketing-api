@@ -8,6 +8,7 @@ import dev.rogerbertan.reactive_ticketing_api.event.application.port.`in`.comman
 import dev.rogerbertan.reactive_ticketing_api.event.application.port.out.EventRepository
 import kotlinx.coroutines.flow.Flow
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class EventService(
@@ -18,7 +19,7 @@ class EventService(
         return repository.findAll()
     }
 
-    override suspend fun getById(id: Long): Event {
+    override suspend fun getById(id: UUID): Event {
         return repository.findById(id) ?: throw EventNotFoundException(id)
     }
 
@@ -31,7 +32,7 @@ class EventService(
         ))
     }
 
-    override suspend fun delete(id: Long) {
+    override suspend fun delete(id: UUID) {
         if (repository.findById(id) == null) {
             throw EventNotFoundException(id)
         }
