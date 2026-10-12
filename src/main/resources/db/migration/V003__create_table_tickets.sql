@@ -3,7 +3,7 @@ create table tickets(
     event_id uuid not null,
     type varchar(30) not null,
     price decimal(10, 2) not null,
-    quantity int not null,
+    quantity int not null check (quantity >= 0),
 
     primary key(id),
     foreign key(event_id) references events(id) on delete cascade
