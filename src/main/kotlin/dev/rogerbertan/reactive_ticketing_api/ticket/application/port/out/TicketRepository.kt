@@ -7,5 +7,6 @@ import java.util.UUID
 interface TicketRepository {
     fun getTicketsByEventId(eventId: UUID): Flow<Ticket>
     suspend fun getTicketById(id: UUID): Ticket?
+    suspend fun getTicketByIdForUpdate(id: UUID): Ticket?
     suspend fun save(ticket: Ticket): Ticket
 }

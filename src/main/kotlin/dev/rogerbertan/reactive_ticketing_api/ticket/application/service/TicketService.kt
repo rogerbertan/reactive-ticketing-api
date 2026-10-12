@@ -24,7 +24,7 @@ class TicketService(
 
     @Transactional
     override suspend fun addTicket(cmd: AddTicketsCommand): Ticket {
-        val ticket = getTicketsById(cmd.ticketId)
+        val ticket = getTicketForUpdate(cmd.ticketId)
         ticket.addTickets(cmd.quantity)
         return repository.save(ticket)
     }
@@ -41,7 +41,7 @@ class TicketService(
 
     @Transactional
     override suspend fun sellTickets(cmd: SellTicketsCommand): Ticket {
-        val ticket = getTicketsById(cmd.ticketId)
+        val ticket = getTicketForUpdate(cmd.ticketId)
         ticket.sell(cmd.quantity)
         return repository.save(ticket)
     }
@@ -49,5 +49,9 @@ class TicketService(
     @Transactional(readOnly = true)
     override suspend fun getTicketsById(id: UUID): Ticket {
         return repository.getTicketById(id) ?: throw TicketNotFoundException(id)
+    }
+
+    private suspend fun getTicketForUpdate(id: UUID): Ticket {
+        return repository.getTicketByIdForUpdate(id) ?: throw TicketNotFoundException(id)
     }
 }

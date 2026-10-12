@@ -20,6 +20,10 @@ class TicketPersistenceAdapter(
         return repository.findById(id)?.toDomain()
     }
 
+    override suspend fun getTicketByIdForUpdate(id: UUID): Ticket? {
+        return repository.findByIdForUpdate(id)?.toDomain()
+    }
+
     override suspend fun save(ticket: Ticket): Ticket {
         return repository.save(ticket.toEntity()).toDomain()
     }
