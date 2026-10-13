@@ -16,6 +16,8 @@ Além do CRUD tradicional, a API expõe endpoints em **Server-Sent Events (SSE)*
 | PostgreSQL 16                          | Banco de dados                   |
 | Docker Compose                         | Subir o banco localmente         |
 | Gradle (wrapper)                       | Build                            |
+| JUnit 5, MockK, Testcontainers         | Testes unitários e de integração |
+| PIT, JaCoCo                            | Testes de mutação e cobertura    |
 
 ## Pré-requisitos
 
@@ -71,10 +73,11 @@ curl http://localhost:8080/v1/events
 ### Rodando os testes
 
 ```bash
-./gradlew test
+./gradlew test     # unitários + integração; gera o relatório de cobertura (JaCoCo)
+./gradlew pitest   # testes de mutação
 ```
 
-Os testes sobem o contexto completo do Spring, então o PostgreSQL precisa estar rodando.
+Os testes de integração usam Testcontainers, então o **Docker** precisa estar rodando (não é preciso subir o `docker compose`). Estratégia, relatórios e o que cada teste garante estão em [docs/testing.md](docs/testing.md).
 
 ### Parando o ambiente
 
@@ -154,3 +157,4 @@ src/main/resources/
 | [Fluxos](docs/flows.md)             | Diagramas de sequência da venda, reposição, criação de ingressos e streams SSE; controle de concorrência |
 | [API](docs/api.md)                  | Referência completa dos endpoints, payloads, validações e erros                                          |
 | [Banco de dados](docs/database.md)  | Modelo de dados (ER), migrations e dados de exemplo                                                      |
+| [Testes](docs/testing.md)           | Estratégia de testes, como executar, relatórios de cobertura e mutação, e o que cada teste garante       |
