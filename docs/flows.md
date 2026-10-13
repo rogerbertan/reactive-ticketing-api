@@ -75,7 +75,9 @@ sequenceDiagram
     TC-->>C: 200 OK {id, type, price, quantity}
 ```
 
-A criação de um novo tipo de ingresso (`POST /v1/tickets`) segue o mesmo padrão: salva no banco e emite o ingresso criado no `ticketFlow`.
+Uma quantidade zero ou negativa é rejeitada por `ticket.addTickets` com `400 Invalid Ticket Quantity`, e nada é salvo.
+
+A criação de um novo tipo de ingresso (`POST /v1/tickets`) segue o mesmo padrão: o `TicketService` confirma que o evento existe via `EventUseCase.getById` (senão `404 Event Not Found`), salva no banco e emite o ingresso criado no `ticketFlow`.
 
 ## Stream de ingressos de um evento (SSE)
 
@@ -121,7 +123,10 @@ sequenceDiagram
 
     C->>EC: GET /v1/events/categories/show
     EC->>ES: getByType("show")
-    ES->>ES: EventType.valueOf("SHOW")
+    ES->>ES: resolve EventType ("show" → SHOW)
+    alt categoria inexistente
+        ES-->>C: 400 Invalid Event Type
+    end
     ES->>DB: SELECT * FROM events WHERE type = 'SHOW'
     loop para cada evento (intervalo de 4s)
         EC-->>C: data: {evento}

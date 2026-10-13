@@ -84,6 +84,7 @@ flowchart TB
     tuc -. implementado por .-> ts
     suc -. implementado por .-> ss
     ss --> tuc
+    ts --> euc
     es --> er
     ts --> tr
     ss --> sr
@@ -93,7 +94,7 @@ flowchart TB
     epa & tpa & spa --> db
 ```
 
-Hexágonos (`{{ }}`) são portas (interfaces); retângulos são implementações. O `SaleService` depende do `TicketUseCase` (e não do repositório de tickets) para reaproveitar a regra de baixa de estoque.
+Hexágonos (`{{ }}`) são portas (interfaces); retângulos são implementações. O `SaleService` depende do `TicketUseCase` (e não do repositório de tickets) para reaproveitar a regra de baixa de estoque. Da mesma forma, o `TicketService` usa o `EventUseCase` para validar que o evento existe antes de criar um ingresso.
 
 ## Camadas e responsabilidades
 

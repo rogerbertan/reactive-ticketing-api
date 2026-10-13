@@ -29,12 +29,14 @@ Erros de negócio seguem o formato [ProblemDetail (RFC 9457)](https://www.rfc-ed
 }
 ```
 
-| Situação                              | Status | `title`                |
-|---------------------------------------|--------|------------------------|
-| Evento não encontrado                 | `404`  | `Event Not Found`      |
-| Ingresso não encontrado               | `404`  | `Ticket Not Found`     |
-| Estoque insuficiente para a venda     | `400`  | `Insufficient Tickets` |
-| Falha de validação do body (`@Valid`) | `400`  | `Bad Request`          |
+| Situação                                     | Status | `title`                   |
+|----------------------------------------------|--------|---------------------------|
+| Evento não encontrado                        | `404`  | `Event Not Found`         |
+| Ingresso não encontrado                      | `404`  | `Ticket Not Found`        |
+| Estoque insuficiente para a venda            | `400`  | `Insufficient Tickets`    |
+| Quantidade zero ou negativa na reposição     | `400`  | `Invalid Ticket Quantity` |
+| Categoria de evento inexistente              | `400`  | `Invalid Event Type`      |
+| Falha de validação do body (`@Valid`)        | `400`  | `Bad Request`             |
 
 ---
 
@@ -124,7 +126,7 @@ data:{"id":"3fdfdfd5-...","type":"SHOW","name":"Taylor Swift","date":"2024-02-15
 data:{"id":"8ff50feb-...","type":"SHOW","name":"Stand-up Comedy","date":"2024-03-18","description":"..."}
 ```
 
-Eventos criados via `POST /v1/events` enquanto a conexão está aberta também são enviados (de qualquer categoria). Uma categoria inexistente gera erro, pois não há tratamento específico para ela.
+Eventos criados via `POST /v1/events` enquanto a conexão está aberta também são enviados (de qualquer categoria). Uma categoria inexistente retorna `400 Invalid Event Type`, com os tipos válidos no `detail`.
 
 ---
 
@@ -158,7 +160,7 @@ Depois do estado inicial, a conexão continua aberta e recebe o ingresso atualiz
 
 | Campo      | Tipo         | Obrigatório | Regras                   |
 |------------|--------------|-------------|--------------------------|
-| `eventId`  | UUID         | sim         | evento deve existir (FK) |
+| `eventId`  | UUID         | sim         | evento deve existir      |
 | `type`     | `TicketType` | sim         | um dos valores do enum   |
 | `price`    | decimal      | sim         | maior que zero           |
 | `quantity` | int          | sim         | maior que zero           |
@@ -180,6 +182,8 @@ Resposta `201 Created`:
 { "id": "<uuid>", "type": "VIP", "price": 250.00, "quantity": 10 }
 ```
 
+Erros: `404 Event Not Found` se o evento não existir; `400 Bad Request` se o body for inválido.
+
 ### Repor ingressos
 
 `PATCH /v1/tickets/{id}/add?quantity={n}`
@@ -188,7 +192,9 @@ Resposta `201 Created`:
 curl -X PATCH "http://localhost:8080/v1/tickets/<id-do-ingresso>/add?quantity=5"
 ```
 
-Respostas: `200 OK` com o ingresso atualizado, ou `404` se o ingresso não existir.
+`quantity` deve ser maior que zero.
+
+Respostas: `200 OK` com o ingresso atualizado, `404` se o ingresso não existir, ou `400 Invalid Ticket Quantity` se `quantity` for zero ou negativa.
 
 ---
 
@@ -198,10 +204,10 @@ Respostas: `200 OK` com o ingresso atualizado, ou `404` se o ingresso não exist
 
 `POST /v1/tickets/sale`
 
-| Campo      | Tipo | Obrigatório |
-|------------|------|-------------|
-| `ticketId` | UUID | sim         |
-| `quantity` | int  | sim         |
+| Campo      | Tipo | Obrigatório | Regras         |
+|------------|------|-------------|----------------|
+| `ticketId` | UUID | sim         |                |
+| `quantity` | int  | sim         | maior que zero |
 
 ```bash
 curl -X POST http://localhost:8080/v1/tickets/sale \
@@ -226,5 +232,6 @@ Erros:
 
 - `404 Ticket Not Found` — ingresso não existe
 - `400 Insufficient Tickets` — quantidade maior que o estoque disponível
+- `400 Bad Request` — body inválido (por exemplo, `quantity` zero ou negativa)
 
 Como a venda funciona por dentro (transação, lock e notificação SSE) está em [Fluxos](flows.md#venda-de-ingressos).
