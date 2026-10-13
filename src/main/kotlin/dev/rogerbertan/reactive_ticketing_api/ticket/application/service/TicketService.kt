@@ -1,5 +1,6 @@
 package dev.rogerbertan.reactive_ticketing_api.ticket.application.service
 
+import dev.rogerbertan.reactive_ticketing_api.event.application.port.`in`.EventUseCase
 import dev.rogerbertan.reactive_ticketing_api.ticket.application.domain.Ticket
 import dev.rogerbertan.reactive_ticketing_api.ticket.application.domain.exception.TicketNotFoundException
 import dev.rogerbertan.reactive_ticketing_api.ticket.application.port.`in`.TicketUseCase
@@ -14,7 +15,8 @@ import java.util.UUID
 
 @Service
 class TicketService(
-    private val repository: TicketRepository
+    private val repository: TicketRepository,
+    private val eventUseCase: EventUseCase
 ) : TicketUseCase {
 
     @Transactional(readOnly = true)
@@ -31,6 +33,7 @@ class TicketService(
 
     @Transactional
     override suspend fun createTicket(cmd: CreateTicketCommand): Ticket {
+        eventUseCase.getById(cmd.eventId)
         return repository.save(Ticket(
             eventId = cmd.eventId,
             type = cmd.type,
