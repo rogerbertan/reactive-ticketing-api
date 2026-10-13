@@ -62,7 +62,7 @@ class TicketController(
 
     @PostMapping("/tickets/sale")
     @ResponseStatus(HttpStatus.CREATED)
-    suspend fun createSale(@RequestBody request: SaleRequest): SaleResponse {
+    suspend fun createSale(@Valid @RequestBody request: SaleRequest): SaleResponse {
         val sale = saleService.createSale(request.toCommand())
         val ticket = ticketService.getTicketsById(sale.ticketId)
         ticketFlow.emit(ticket)
