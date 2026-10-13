@@ -3,6 +3,7 @@ package dev.rogerbertan.reactive_ticketing_api.event.application.service
 import dev.rogerbertan.reactive_ticketing_api.event.application.domain.Event
 import dev.rogerbertan.reactive_ticketing_api.event.application.domain.EventType
 import dev.rogerbertan.reactive_ticketing_api.event.application.domain.exception.EventNotFoundException
+import dev.rogerbertan.reactive_ticketing_api.event.application.domain.exception.InvalidEventTypeException
 import dev.rogerbertan.reactive_ticketing_api.event.application.port.`in`.EventUseCase
 import dev.rogerbertan.reactive_ticketing_api.event.application.port.`in`.command.CreateEventCommand
 import dev.rogerbertan.reactive_ticketing_api.event.application.port.out.EventRepository
@@ -46,7 +47,8 @@ class EventService(
 
     @Transactional(readOnly = true)
     override fun getByType(type: String): Flow<Event> {
-        val eventType = EventType.valueOf(type.uppercase())
+        val eventType = EventType.entries.find { it.name == type.uppercase() }
+            ?: throw InvalidEventTypeException(type)
         return repository.findByType(eventType)
     }
 }

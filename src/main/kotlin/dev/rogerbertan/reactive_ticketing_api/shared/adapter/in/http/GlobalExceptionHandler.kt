@@ -1,7 +1,9 @@
 package dev.rogerbertan.reactive_ticketing_api.shared.adapter.`in`.http
 
 import dev.rogerbertan.reactive_ticketing_api.event.application.domain.exception.EventNotFoundException
+import dev.rogerbertan.reactive_ticketing_api.event.application.domain.exception.InvalidEventTypeException
 import dev.rogerbertan.reactive_ticketing_api.ticket.application.domain.exception.InsufficientTicketsException
+import dev.rogerbertan.reactive_ticketing_api.ticket.application.domain.exception.InvalidTicketQuantityException
 import dev.rogerbertan.reactive_ticketing_api.ticket.application.domain.exception.TicketNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
@@ -18,6 +20,16 @@ class GlobalExceptionHandler {
             ex.message
         )
         problem.title = "Event Not Found"
+        return problem
+    }
+
+    @ExceptionHandler(InvalidEventTypeException::class)
+    fun handleInvalidEventTypeException(ex: InvalidEventTypeException): ProblemDetail {
+        val problem = ProblemDetail.forStatusAndDetail(
+            HttpStatus.BAD_REQUEST,
+            ex.message
+        )
+        problem.title = "Invalid Event Type"
         return problem
     }
 
@@ -38,6 +50,16 @@ class GlobalExceptionHandler {
             ex.message
         )
         problem.title = "Insufficient Tickets"
+        return problem
+    }
+
+    @ExceptionHandler(InvalidTicketQuantityException::class)
+    fun handleInvalidTicketQuantityException(ex: InvalidTicketQuantityException): ProblemDetail {
+        val problem = ProblemDetail.forStatusAndDetail(
+            HttpStatus.BAD_REQUEST,
+            ex.message
+        )
+        problem.title = "Invalid Ticket Quantity"
         return problem
     }
 }
